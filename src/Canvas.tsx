@@ -1,12 +1,23 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, forwardRef } from 'react';
 
 interface CanvasProps {
   clearCanvas: boolean;
   onCanvasCleared: () => void;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ clearCanvas, onCanvasCleared }) => {
+const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanvasCleared }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Forward the ref
+  useEffect(() => {
+    if (ref) {
+      if (typeof ref === 'function') {
+        ref(canvasRef.current);
+      } else {
+        ref.current = canvasRef.current;
+      }
+    }
+  }, [ref]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(null);
 

@@ -24,16 +24,16 @@ h1 {
   font-size: 24px;
 }
 
-.clear-button {
+.send-button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.clear-button:hover {
-  background-color: #0056b3;
+.send-button:hover {
+  background-color: #218838;
 }
