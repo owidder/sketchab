@@ -1,6 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-const Canvas: React.FC = () => {
+interface CanvasProps {
+  clearCanvas: boolean;
+  onCanvasCleared: () => void;
+}
+
+const Canvas: React.FC<CanvasProps> = ({ clearCanvas, onCanvasCleared }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(null);
@@ -28,6 +33,21 @@ const Canvas: React.FC = () => {
       window.removeEventListener('resize', resizeCanvas);
     };
   }, []);
+
+  const clearCanvasContent = useCallback(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (canvas && context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (clearCanvas) {
+      clearCanvasContent();
+      onCanvasCleared();
+    }
+  }, [clearCanvas, clearCanvasContent, onCanvasCleared]);
 
   const startDrawing = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
