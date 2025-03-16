@@ -10,10 +10,28 @@ const App: React.FC = () => {
     setClearCanvas(false);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (canvasRef.current) {
       const base64Image = canvasRef.current.toDataURL('image/png');
-      console.log(base64Image);
+      
+      try {
+        const response = await fetch('http://localhost:11434/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: base64Image }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.text();
+        console.log('Response:', data);
+      } catch (error) {
+        console.error('Error sending request:', error);
+      }
     }
   };
 
