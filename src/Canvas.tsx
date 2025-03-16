@@ -8,12 +8,24 @@ const Canvas: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
     const context = canvas.getContext('2d');
     if (!context) return;
 
     context.strokeStyle = 'black';
     context.lineWidth = 2;
     context.lineCap = 'round';
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
   }, []);
 
   const startDrawing = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -45,8 +57,6 @@ const Canvas: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      width={800}
-      height={600}
       onMouseDown={startDrawing}
       onMouseMove={draw}
       onMouseUp={stopDrawing}
@@ -54,7 +64,7 @@ const Canvas: React.FC = () => {
       onTouchStart={startDrawing}
       onTouchMove={draw}
       onTouchEnd={stopDrawing}
-      style={{ border: '1px solid black' }}
+      style={{ display: 'block', width: '100%', height: '100%' }}
     />
   );
 };

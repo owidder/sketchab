@@ -1,10 +1,10 @@
 import React from 'react';
 import Canvas from './Canvas';
+import './App.css';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <h1>React Canvas Sketch</h1>
       <Canvas />
     </div>
   );
