@@ -111,6 +111,6 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanv
       style={{ display: 'block', width: '100%', height: '100%' }}
     />
   );
-};
+})
 
 export default Canvas;
