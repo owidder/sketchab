@@ -3,9 +3,10 @@ import React, { useRef, useEffect, useState, useCallback, forwardRef } from 'rea
 interface CanvasProps {
   clearCanvas: boolean;
   onCanvasCleared: () => void;
+  onCanvasUpdated: (dataUrl: string) => void;
 }
 
-const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanvasCleared }, ref) => {
+const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanvasCleared, onCanvasUpdated }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Forward the ref
@@ -25,13 +26,8 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanv
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     const context = canvas.getContext('2d');
     if (!context) return;
@@ -39,11 +35,27 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanv
     context.strokeStyle = 'black';
     context.lineWidth = 2;
     context.lineCap = 'round';
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
   }, []);
+
+  const resizeAndGetDataUrl = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resizedCanvas = document.createElement('canvas');
+    resizedCanvas.width = 100;
+    resizedCanvas.height = 100;
+    const resizedContext = resizedCanvas.getContext('2d');
+
+    if (resizedContext) {
+      resizedContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 100, 100);
+      const dataUrl = resizedCanvas.toDataURL('image/png');
+      onCanvasUpdated(dataUrl);
+    }
+  }, [onCanvasUpdated]);
+
+  useEffect(() => {
+    resizeAndGetDataUrl();
+  }, [resizeAndGetDataUrl]);
 
   const clearCanvasContent = useCallback(() => {
     const canvas = canvasRef.current;
@@ -86,6 +98,7 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({ clearCanvas, onCanv
     context.stroke();
 
     setLastPoint(currentPoint);
+    resizeAndGetDataUrl();
   };
 
   const getEventPoint = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {

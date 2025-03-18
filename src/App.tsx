@@ -1,18 +1,23 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Canvas from './Canvas';
 import './App.css';
 
 const App: React.FC = () => {
   const [clearCanvas, setClearCanvas] = useState(false);
+  const [resizedDataUrl, setResizedDataUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleCanvasCleared = () => {
     setClearCanvas(false);
   };
 
+  const handleCanvasUpdated = useCallback((dataUrl: string) => {
+    setResizedDataUrl(dataUrl);
+  }, []);
+
   const handleSend = async () => {
-    if (canvasRef.current) {
-      const base64Image = canvasRef.current.toDataURL('image/png');
+    if (resizedDataUrl) {
+      const base64Image = resizedDataUrl;
       
       try {
         const response = await fetch('http://localhost:11434/api/generate', {
@@ -54,6 +59,7 @@ const App: React.FC = () => {
       <Canvas 
         clearCanvas={clearCanvas} 
         onCanvasCleared={handleCanvasCleared} 
+        onCanvasUpdated={handleCanvasUpdated}
         ref={canvasRef}
       />
     </div>
