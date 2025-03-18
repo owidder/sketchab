@@ -15,12 +15,19 @@ const App: React.FC = () => {
       const base64Image = canvasRef.current.toDataURL('image/png');
       
       try {
-        const response = await fetch('http://localhost:11434/api/chat', {
+        const response = await fetch('http://localhost:11434/api/generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ image: base64Image }),
+          body: JSON.stringify(
+              {
+                "model": "llava",
+                "prompt":"What is in this picture? Please answer with just one word!",
+                "stream": false,
+                "images": [base64Image.split(',')[1]]
+              }
+          ),
         });
 
         if (!response.ok) {
@@ -28,7 +35,10 @@ const App: React.FC = () => {
         }
 
         const data = await response.text();
-        console.log('Response:', data);
+        const sanitizedData = data.replace(/\s/g, '');
+        const res = JSON.parse(`[${sanitizedData.trim()}]`);
+        console.log(base64Image.split(',')[1]);
+        console.log(res[0].response);
       } catch (error) {
         console.error('Error sending request:', error);
       }
